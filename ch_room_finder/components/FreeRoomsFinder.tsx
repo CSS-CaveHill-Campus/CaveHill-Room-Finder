@@ -6,6 +6,7 @@ import type { FreeRoomItem, Day } from '@/types/api';
 import { DAY_LABELS } from '@/types/api';
 import LoadingSpinner from './LoadingSpinner';
 import ErrorMessage from './ErrorMessage';
+import SearchableDropdown from './SearchableDropdown';
 
 export default function FreeRoomsFinder() {
   const [freeRooms, setFreeRooms] = useState<FreeRoomItem[]>([]);
@@ -19,16 +20,21 @@ export default function FreeRoomsFinder() {
   const [selectedHour, setSelectedHour] = useState<string>('');
   const [duration, setDuration] = useState<number>(1);
 
-  // Load rooms
+  // Load rooms, filtering out "None" values
   useEffect(() => {
     getRooms()
-      .then(setAllRooms)
+      .then((rooms) => {
+        const validRooms = rooms.filter(
+          (room) => room && room.toLowerCase() !== 'none'
+        );
+        setAllRooms(validRooms);
+      })
       .catch((err) => {
         console.error('Failed to load rooms:', err);
       });
   }, []);
 
-  // Fetch free rooms
+  // Fetch free rooms, filtering out "None" values
   const fetchFreeRooms = async () => {
     if (!selectedDay) return;
 
@@ -44,7 +50,17 @@ export default function FreeRoomsFinder() {
       }
 
       const data = await getFreeRooms(params);
-      setFreeRooms(data);
+
+      // Filter out any rooms with "None" values
+      const validRooms = data.filter(
+        (room) =>
+          room.room &&
+          room.room.toLowerCase() !== 'none' &&
+          room.building &&
+          room.building.toLowerCase() !== 'none'
+      );
+
+      setFreeRooms(validRooms);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch free rooms');
     } finally {
@@ -123,23 +139,13 @@ export default function FreeRoomsFinder() {
           )}
 
           {/* Specific Room Filter - Optional */}
-          <div>
-            <label className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              Specific Room (Optional)
-            </label>
-            <select
-              value={selectedRoom}
-              onChange={(e) => setSelectedRoom(e.target.value)}
-              className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800"
-            >
-              <option value="">All Rooms</option>
-              {allRooms.map((room) => (
-                <option key={room} value={room}>
-                  {room}
-                </option>
-              ))}
-            </select>
-          </div>
+          <SearchableDropdown
+            value={selectedRoom}
+            onChange={setSelectedRoom}
+            options={allRooms}
+            label="Specific Room (Optional)"
+            placeholder="All Rooms"
+          />
         </div>
 
         {selectedHour && (

@@ -6,6 +6,7 @@ import type { ScheduleItem, Day, Faculty, PrefixItem } from '@/types/api';
 import { DAY_LABELS, CLASS_TYPE_LABELS, FACULTY_LABELS } from '@/types/api';
 import LoadingSpinner from './LoadingSpinner';
 import ErrorMessage from './ErrorMessage';
+import SearchableDropdown from './SearchableDropdown';
 
 export default function ScheduleViewer() {
   const [schedule, setSchedule] = useState<ScheduleItem[]>([]);
@@ -21,19 +22,29 @@ export default function ScheduleViewer() {
   const [selectedPrefix, setSelectedPrefix] = useState<string>('');
   const [limit, setLimit] = useState<number>(20);
 
-  // Load initial data
+  // Load initial data, filtering out "None" values
   useEffect(() => {
     Promise.all([getRooms(), getPrefixes()])
       .then(([roomsData, prefixesData]) => {
-        setRooms(roomsData);
-        setPrefixes(prefixesData);
+        const validRooms = roomsData.filter(
+          (room) => room && room.toLowerCase() !== 'none'
+        );
+        const validPrefixes = prefixesData.filter(
+          (prefix) =>
+            prefix.prefix &&
+            prefix.prefix.toLowerCase() !== 'none' &&
+            prefix.desc &&
+            prefix.desc.toLowerCase() !== 'none'
+        );
+        setRooms(validRooms);
+        setPrefixes(validPrefixes);
       })
       .catch((err) => {
         console.error('Failed to load initial data:', err);
       });
   }, []);
 
-  // Fetch schedule
+  // Fetch schedule, filtering out "None" values
   const fetchSchedule = async () => {
     setLoading(true);
     setError(null);
@@ -49,7 +60,19 @@ export default function ScheduleViewer() {
       }
 
       const data = await getSchedule(params);
-      setSchedule(data);
+
+      // Filter out any schedule items with "None" values
+      const validSchedule = data.filter(
+        (item) =>
+          item.course_code &&
+          item.course_code.toLowerCase() !== 'none' &&
+          item.room &&
+          item.room.toLowerCase() !== 'none' &&
+          item.building &&
+          item.building.toLowerCase() !== 'none'
+      );
+
+      setSchedule(validSchedule);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch schedule');
     } finally {
@@ -95,23 +118,13 @@ export default function ScheduleViewer() {
           </div>
 
           {/* Room Filter */}
-          <div>
-            <label className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              Room
-            </label>
-            <select
-              value={selectedRoom}
-              onChange={(e) => setSelectedRoom(e.target.value)}
-              className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800"
-            >
-              <option value="">All Rooms</option>
-              {rooms.map((room) => (
-                <option key={room} value={room}>
-                  {room}
-                </option>
-              ))}
-            </select>
-          </div>
+          <SearchableDropdown
+            value={selectedRoom}
+            onChange={setSelectedRoom}
+            options={rooms}
+            label="Room"
+            placeholder="All Rooms"
+          />
 
           {/* Faculty Filter */}
           <div>
