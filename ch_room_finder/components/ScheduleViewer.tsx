@@ -160,7 +160,7 @@ export default function ScheduleViewer() {
             >
               <option value="">All Prefixes</option>
               {filteredPrefixes.map((prefix) => (
-                <option key={prefix.prefix} value={prefix.prefix}>
+                <option key={`${prefix.faculty}-${prefix.prefix}`} value={prefix.prefix}>
                   {prefix.prefix} - {prefix.desc}
                 </option>
               ))}
