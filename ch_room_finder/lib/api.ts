@@ -11,7 +11,9 @@ import type {
   PrefixParams,
 } from '@/types/api';
 
-const API_BASE_URL = 'https://chroomfinduh.onrender.com/api/v1';
+// Use local Next.js API routes which proxy to the external API
+// This bypasses CORS issues and handles cold starts server-side
+const API_BASE_URL = '/api/v1';
 
 // Helper function to build query string
 function buildQueryString(params: Record<string, any>): string {
@@ -30,11 +32,12 @@ function buildQueryString(params: Record<string, any>): string {
 // Generic fetch function with error handling
 async function apiFetch<T>(endpoint: string): Promise<T> {
   try {
-    const response = await fetch(endpoint, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    console.log(`Fetching: ${endpoint}`);
+    const response = await fetch(endpoint);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
     const data: ApiResponse<T> = await response.json();
 

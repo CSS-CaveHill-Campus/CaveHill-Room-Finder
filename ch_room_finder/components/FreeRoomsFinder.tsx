@@ -187,7 +187,7 @@ export default function FreeRoomsFinder() {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {freeRooms.map((room, index) => (
               <div
-                key={index}
+                key={`${room.room}-${room.day}-${room.available_from}-${room.available_to}-${index}`}
                 className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
               >
                 <div className="mb-3 flex items-start justify-between">
