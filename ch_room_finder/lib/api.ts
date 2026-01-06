@@ -32,7 +32,6 @@ function buildQueryString(params: Record<string, any>): string {
 // Generic fetch function with error handling
 async function apiFetch<T>(endpoint: string): Promise<T> {
   try {
-    console.log(`Fetching: ${endpoint}`);
     const response = await fetch(endpoint);
 
     if (!response.ok) {
