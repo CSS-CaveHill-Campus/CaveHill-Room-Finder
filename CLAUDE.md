@@ -12,6 +12,9 @@ This project will be built leveraging:
 
 - NextJS: UI Framework
 - ReactJS: UI Library
+- TypeScript: The language.
+- Bun: Runtime
+- `tsc -b`: To perform type checking.
 
 Any other tools are at your discretion.
 
