@@ -4,7 +4,7 @@ CaveHill Room Finder is a website that provides access for students to determine
 
 ## Using the application
 
-Visit the website [here](https://www.example.com).
+Visit the website [here](https://cavehill-room-finder.onrender.com).
 
 ## Building the application
 
