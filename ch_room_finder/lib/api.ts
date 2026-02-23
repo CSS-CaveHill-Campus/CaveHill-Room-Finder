@@ -35,13 +35,17 @@ async function apiFetch<T>(endpoint: string): Promise<T> {
     const response = await fetch(endpoint);
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const error = new Error(`HTTP error! status: ${response.status}`) as Error & { status?: number };
+      error.status = response.status;
+      throw error;
     }
 
     const data: ApiResponse<T> = await response.json();
 
     if (data.status === 'failed') {
-      throw new Error(data.error.message || 'API request failed');
+      const error = new Error(data.error.message || 'API request failed') as Error & { status?: number };
+      error.status = data.error.code;
+      throw error;
     }
 
     return data.data;

@@ -14,6 +14,7 @@ export default function ScheduleViewer() {
   const [prefixes, setPrefixes] = useState<PrefixItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [is500Error, setIs500Error] = useState(false);
 
   // Filter states
   const [selectedDay, setSelectedDay] = useState<Day | ''>('');
@@ -48,6 +49,7 @@ export default function ScheduleViewer() {
   const fetchSchedule = async () => {
     setLoading(true);
     setError(null);
+    setIs500Error(false);
 
     try {
       const params: any = { limit };
@@ -74,7 +76,11 @@ export default function ScheduleViewer() {
 
       setSchedule(validSchedule);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch schedule');
+      const error = err as Error & { status?: number };
+      setError(error.message || 'Failed to fetch schedule');
+      if (error.status === 500) {
+        setIs500Error(true);
+      }
     } finally {
       setLoading(false);
     }
@@ -83,6 +89,13 @@ export default function ScheduleViewer() {
   useEffect(() => {
     fetchSchedule();
   }, [selectedDay, selectedRoom, selectedFaculty, selectedPrefix, limit]);
+
+  const handleRetry = async () => {
+    await fetch('/api/v1/schedule', { signal: AbortSignal.timeout(60000) });
+    setTimeout(() => {
+      window.location.reload();
+    }, 60000);
+  };
 
   // Get filtered prefixes based on selected faculty
   const filteredPrefixes = selectedFaculty
@@ -188,7 +201,7 @@ export default function ScheduleViewer() {
 
       {/* Results */}
       {loading && <LoadingSpinner message="Fetching schedule..." />}
-      {error && <ErrorMessage message={error} />}
+      {error && <ErrorMessage message={error} onRetry={is500Error ? handleRetry : undefined} />}
 
       {!loading && !error && schedule.length === 0 && (
         <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-8 text-center dark:border-zinc-800 dark:bg-zinc-900/50">

@@ -13,6 +13,7 @@ export default function FreeRoomsFinder() {
   const [allRooms, setAllRooms] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [is500Error, setIs500Error] = useState(false);
 
   // Filter states
   const [selectedDay, setSelectedDay] = useState<Day>('mon');
@@ -40,6 +41,7 @@ export default function FreeRoomsFinder() {
 
     setLoading(true);
     setError(null);
+    setIs500Error(false);
 
     try {
       const params: any = { day: selectedDay };
@@ -62,7 +64,11 @@ export default function FreeRoomsFinder() {
 
       setFreeRooms(validRooms);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch free rooms');
+      const error = err as Error & { status?: number };
+      setError(error.message || 'Failed to fetch free rooms');
+      if (error.status === 500) {
+        setIs500Error(true);
+      }
     } finally {
       setLoading(false);
     }
@@ -71,6 +77,13 @@ export default function FreeRoomsFinder() {
   useEffect(() => {
     fetchFreeRooms();
   }, [selectedDay, selectedRoom, selectedHour, duration]);
+
+  const handleRetry = async () => {
+    await fetch('/api/v1/free', { signal: AbortSignal.timeout(60000) });
+    setTimeout(() => {
+      window.location.reload();
+    }, 60000);
+  };
 
   // Generate hour options (6 AM to 10 PM)
   const hourOptions = Array.from({ length: 17 }, (_, i) => i + 6);
@@ -158,7 +171,7 @@ export default function FreeRoomsFinder() {
 
       {/* Results */}
       {loading && <LoadingSpinner message="Finding free rooms..." />}
-      {error && <ErrorMessage message={error} />}
+      {error && <ErrorMessage message={error} onRetry={is500Error ? handleRetry : undefined} />}
 
       {!loading && !error && freeRooms.length === 0 && (
         <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-8 text-center dark:border-zinc-800 dark:bg-zinc-900/50">
