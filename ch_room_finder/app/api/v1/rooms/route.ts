@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const EXTERNAL_API_BASE = 'https://chroomfinduh.onrender.com/api/v1';
+const EXTERNAL_API_BASE = process.env.EXTERNAL_API_BASE || 'https://chroomfinduh.onrender.com/api/v1';
 
 export async function GET(request: NextRequest) {
   try {
