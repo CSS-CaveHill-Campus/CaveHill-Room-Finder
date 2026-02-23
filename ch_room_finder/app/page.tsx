@@ -47,15 +47,15 @@ export default function Home() {
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Tabs */}
         <div className="mb-6">
+          <p>Note: The current website is being hosted for free, so there may be issues when loading </p>
           <div className="border-b border-zinc-200 dark:border-zinc-800">
             <nav className="-mb-px flex space-x-8">
               <button
                 onClick={() => setActiveTab('free')}
-                className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition-colors ${
-                  activeTab === 'free'
-                    ? 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400'
-                    : 'border-transparent text-zinc-600 hover:border-zinc-300 hover:text-zinc-900 dark:text-zinc-400 dark:hover:border-zinc-700 dark:hover:text-zinc-300'
-                }`}
+                className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition-colors ${activeTab === 'free'
+                  ? 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400'
+                  : 'border-transparent text-zinc-600 hover:border-zinc-300 hover:text-zinc-900 dark:text-zinc-400 dark:hover:border-zinc-700 dark:hover:text-zinc-300'
+                  }`}
               >
                 <div className="flex items-center gap-2">
                   <svg
@@ -75,11 +75,10 @@ export default function Home() {
 
               <button
                 onClick={() => setActiveTab('schedule')}
-                className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition-colors ${
-                  activeTab === 'schedule'
-                    ? 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400'
-                    : 'border-transparent text-zinc-600 hover:border-zinc-300 hover:text-zinc-900 dark:text-zinc-400 dark:hover:border-zinc-700 dark:hover:text-zinc-300'
-                }`}
+                className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition-colors ${activeTab === 'schedule'
+                  ? 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400'
+                  : 'border-transparent text-zinc-600 hover:border-zinc-300 hover:text-zinc-900 dark:text-zinc-400 dark:hover:border-zinc-700 dark:hover:text-zinc-300'
+                  }`}
               >
                 <div className="flex items-center gap-2">
                   <svg
